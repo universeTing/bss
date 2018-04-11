@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jjxx.modules.base.mapper.BaseProjectBasicInfoMapper" >
+
+  <sql id="Base_Column_List" >
+    t.id,
+    t.org_id,
+    t.project_number,
+    t.project_full_name,
+    t.project_short_name,
+    t.owner_org,
+    t.start_point_name,
+    t.end_point_name,
+    t.start_pile_no,
+    t.end_pile_no,
+    t.start_plan_date,
+    t.end_plan_date,
+    t.start_actual_date,
+    t.end_actual_date,
+    t.legal_representative,
+    t.total_cost,
+    t.construction_type,
+    t.investment_mode,
+    t.main_design_unit,
+    t.unit_cost,
+    t.project_category,
+    t.other_infor,
+    t.project_introduction,
+    t.technical_level,
+    t.route_length,
+    t.roadbed_cut,
+    t.roadbed_protective_engineering,
+    t.roadbed_drainage_works,
+    t.roadbed_width,
+    t.roadbed_fill,
+    t.od_pile_no,
+    t.grand_bridge,
+    t.great_bridge,
+    t.middle_bridge,
+    t.small_bridge,
+    t.bridge_width,
+    t.design_load,
+    t.design_speed,
+    t.culvert_channel,
+    t.separate_grade_crossing,
+    t.interchange,
+    t.pavement_thickness,
+    t.pavement_structure_type,
+    t.roadbed_cement_concrete_area,
+    t.roadbed_asphalt_concrete_area,
+    t.long_tunnel,
+    t.middle_tunnel,
+    t.short_tunnel,
+    t.super_long_tunnel,
+    t.tunnel_width,
+    t.other,
+    t.create_by AS "createBy.id",
+    u.realname AS "createBy.realname",
+    t.create_date,
+    t.update_by AS "updateBy.id",
+    t.update_date,
+    t.del_flag,
+    org.name AS orgName,
+    t.use_status,
+    t.audit_status
+  </sql>
+
+  <sql id="leftjoin">
+    LEFT JOIN sys_user u on t.create_by=u.id
+    LEFT JOIN sys_organization org  on t.org_id=org.id
+  </sql>
+
+  <!-- 分页查询数据,重写sql语句 -->
+  <select id="selectPage" resultType="BaseProjectBasicInfo">
+    select
+    <include refid="Base_Column_List"/>
+    from base_project_basic_info t
+    <include refid="leftjoin"/>
+    <if test="ew.sqlSegment != '' and ew.sqlSegment != null">
+      <where>
+        ${ew.sqlSegment}
+      </where>
+    </if>
+  </select>
+
+</mapper>

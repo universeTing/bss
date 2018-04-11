@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jjxx.modules.qs.mapper.QsAsideRecordMapper" >
+
+  <sql id="Base_Column_List" >
+    t.id,
+    t.create_by,
+    u.realname AS "createByName",
+    t.create_date,
+    t.update_by,
+    t.update_date,
+    t.del_flag,
+    t.remarks,
+    t.table_id,
+    t.project_title,
+    t.sub_title,
+    t.number,
+    t.aside_man,
+    t.aside_date,
+    t.aside_project,
+    t.process_description,
+    t.aside_situation,
+    t.main_data,
+    t.problem_handle_result,
+    t.attachment,
+    t.org_id,
+    t.bid_id,
+    bp.construction_unit AS construction_unit,
+    bp.contract_number AS contract_number,
+    attachment.attachment_count AS attachmentCount
+  </sql>
+  <sql id="leftJoin">
+  		left join base_bid_segment_basic_info bp on(t.bid_id = bp.id) <!-- 关联基础数据 --> 
+  		left join sys_user u on (t.create_by = u.id) <!-- 关联用户信息 --> 
+  		LEFT JOIN sys_organization o on (t.org_id=o.id)
+  		LEFT JOIN
+        (select count(1) as attachment_count,bill_id from sys_attachment GROUP BY bill_id) attachment 
+            on t.id = attachment.bill_id	<!-- 查找每个旁站记录对应的附件数 -->
+  </sql>
+  <select id="selectPage" resultType="QsAsideRecord">
+  		select  
+		<include refid="Base_Column_List" /> 
+		from 
+		qs_aside_record t 
+	   <include refid="leftJoin"/>
+	   <if test="ew.sqlSegment != '' and ew.sqlSegment != null">  
+		  <where>
+		    ${ew.sqlSegment} 
+		  </where>
+	  </if> 
+  </select>
+  
+  <select id="selectById" resultType="QsAsideRecord">
+		select 
+		<include refid="Base_Column_List"/> 
+		from 
+		qs_aside_record t 
+		<include refid="leftJoin"/>
+		where t.id = #{id}
+	</select>
+
+</mapper>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jjxx.modules.qs.mapper.QsMonthlyMeetingSummaryMapper" >
+
+  <sql id="Base_Column_List" >
+    t.id,
+    t.create_by AS "createBy.id",
+    u.realname AS "createByName",
+    t.create_date,
+    t.update_by AS "updateBy.id",
+    t.update_date,
+    t.del_flag,
+    t.remarks,
+    t.title,
+    t.time,
+    t.location,
+    t.participants,
+    t.attachment,
+    t.org_id,
+    org.name AS orgName,
+    attachment.attachment_count AS attachmentCount
+  </sql>
+  
+   <!-- 关联信息 -->
+  <sql id="leftJoin">
+  		left join sys_user u on (t.create_by = u.id)<!-- 关联用户信息 -->
+  		left join sys_organization org on (t.org_id=org.id)<!-- 关联组织信息 -->
+  		LEFT JOIN
+        (select count(1) as attachment_count,bill_id from sys_attachment GROUP BY bill_id) attachment 
+            on t.id = attachment.bill_id	<!-- 查找每个实施细则对应得附件数 -->
+  </sql>
+  
+	<select id="selectPage" resultType="QsMonthlyMeetingSummary">
+		select  
+		<include refid="Base_Column_List" /> 
+		from 
+		qs_monthly_meeting_summary t 
+		<include refid="leftJoin"/>
+	    <where>
+	         ${ew.sqlSegment} 
+	    </where>
+	</select>
+	
+	<select id="selectById" resultType="QsMonthlyMeetingSummary">
+		select <include refid="Base_Column_List"/> from 
+		qs_monthly_meeting_summary t 
+		<include refid="leftJoin"/>
+		where t.id = #{id}
+	</select>
+	
+</mapper>

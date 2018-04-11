@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jjxx.modules.qs.mapper.QsBigThingsMapper" >
+
+  <sql id="Base_Column_List" >
+    t.id,
+    t.status,
+    t.create_by AS "createBy.id",
+    t.create_date,
+    t.update_by AS "updateBy.id",
+    t.update_date,
+    t.del_flag,
+    t.remarks,
+    t.title,
+    t.org_id,
+    t.attachment,
+    u.realname as "createBy.realname",
+    o.name as orgName,
+    attachment.attachment_count as attachmentCount
+  </sql>
+  <select id="selectDataList" resultType="QsBigThings">
+	  select  
+	  <include refid="Base_Column_List" /> 
+	  from qs_big_things t 
+	  LEFT JOIN sys_user u on t.create_by=u.id 
+	  LEFT JOIN sys_organization o on t.org_id=o.id
+	  LEFT JOIN
+        (select count(*) as attachment_count,bill_id from sys_attachment GROUP BY bill_id) attachment 
+            on t.id = attachment.bill_id
+	  <if test="ew.sqlSegment != '' and ew.sqlSegment != null">  
+		  <where>
+		    ${ew.sqlSegment} 
+		  </where>
+	  </if> 	
+	</select>
+  
+</mapper>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jjxx.modules.qs.mapper.QsBestPictureOfMonthMapper" >
+
+  <sql id="Base_Column_List" >
+    t.id,
+    t.org_id,
+    t.`date`,
+    t.`title`,
+    t.remarks,
+    t.attachment,
+    t.create_by AS "createBy.id",
+    u.realname AS "createBy.realname",
+    t.create_date,
+    t.update_by AS "updateBy.id",
+    t.update_date,
+    t.del_flag,
+    org.name AS orgName,
+    attachment.attachment_count as attachmentCount
+  </sql>
+
+  <sql id="leftjoin">
+    LEFT JOIN sys_user u on t.create_by=u.id
+    LEFT JOIN sys_organization org  on t.org_id=org.id
+    LEFT JOIN
+    (select count(*) as attachment_count,bill_id from sys_attachment GROUP BY bill_id) attachment
+    on t.id = attachment.bill_id
+  </sql>
+
+  <!-- 分页查询数据,重写sql语句 -->
+  <select id="selectPage" resultType="QsBestPictureOfMonth">
+    select
+    <include refid="Base_Column_List"/>
+    from qs_best_picture_of_month t
+    <include refid="leftjoin"/>
+    <if test="ew.sqlSegment != '' and ew.sqlSegment != null">
+      <where>
+        ${ew.sqlSegment}
+      </where>
+    </if>
+  </select>
+</mapper>

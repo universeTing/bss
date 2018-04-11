@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jjxx.modules.base.mapper.CompanyMapper" >
+
+  <sql id="Base_Column_List" >
+    t.id,
+    t.number,
+    t.name,
+    t.company_type,
+    t.simple_name,
+    t.address,
+    t.corporation,
+    t.contacts,
+    t.contacts_phone,
+    t.post_code,
+    t.email,
+    t.fax,
+    t.ind_com_number,
+    t.tax_number,
+    t.description,
+    t.org_id,
+    t.status,
+    t.create_by AS "createBy.id",
+    t.create_date,
+    t.update_by AS "updateBy.id",
+    t.update_date,
+    t.del_flag,
+    t.remarks,
+    u.realname as creator
+  </sql>
+  
+  <!-- 关联组织 -->
+  <sql id="leftJoinOrg">
+		 LEFT JOIN sys_organization o on o.id=t.org_id 
+  </sql>
+  <!-- 关联创建人 -->
+  <sql id="leftJoinUser">
+		 LEFT JOIN sys_user u on u.id=t.create_by 
+  </sql>
+  
+  <!-- 查询学校列表数据 -->
+  <select id="selectPage" resultType="Company">
+  	  select 
+   	  	<include refid="Base_Column_List" />
+      from base_company t 
+      <include refid="leftJoinUser"/>
+      where 1 = 1 
+      ${ew.sqlSegment}    
+  </select>
+  
+</mapper>

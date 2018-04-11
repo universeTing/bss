@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jjxx.modules.base.mapper.BaseBidSegmentBasicInfoMapper" >
+
+  <sql id="Base_Column_List" >
+    t.id,
+    t.org_id,
+    t.bid_segment_number,
+    t.bid_segment_type,
+    t.bid_segment_full_name,
+    t.bid_segment_short_name,
+    t.start_pile_no,
+    t.end_pile_no,
+    t.bid_segment_length,
+    t.broken_chain_length,
+    t.start_date,
+    t.end_date,
+    t.construction_unit,
+    t.supervision_unit,
+    t.total_cost,
+    t.contract_number,
+    t.build_unit,
+    t.other_base_info,
+    t.test_unit,
+    t.contract_period,
+    t.introduction,
+    t.route_length,
+    t.subgrade_width,
+    t.pavement_thickness,
+    t.pavement_structure_type,
+    t.bridge_width,
+    t.tunnel_width,
+    t.subgrade_excavation,
+    t.subgrade_fill,
+    t.subgrade_protection_engineering,
+    t.subgrade_drainage_project,
+    t.roadbed_asphalt_concrete_area,
+    t.roadbed_cement_concrete_area,
+    t.grand_bridge,
+    t.great_bridge,
+    t.middle_bridge,
+    t.small_bridge,
+    t.culvert_channel,
+    t.super_long_tunnel,
+    t.long_tunnel,
+    t.middle_tunnel,
+    t.short_tunnel,
+    t.separate_grade_crossing,
+    t.interchange,
+    t.other,
+    t.create_by AS "createBy.id",
+    t.create_date,
+    t.update_by AS "updateBy.id",
+    t.update_date,
+    t.del_flag,
+    t.use_status,
+    t.audit_status
+
+  </sql>
+
+  <sql id="leftjoin">
+    LEFT JOIN sys_user u on t.create_by=u.id
+    LEFT JOIN sys_organization org  on t.org_id=org.id
+  </sql>
+
+  <!-- 分页查询数据,重写sql语句 -->
+  <select id="selectPage" resultType="BaseBidSegmentBasicInfo">
+    select
+    <include refid="Base_Column_List"/>
+    from base_bid_segment_basic_info t
+    <include refid="leftjoin"/>
+    <if test="ew.sqlSegment != '' and ew.sqlSegment != null">
+      <where>
+        ${ew.sqlSegment}
+      </where>
+    </if>
+  </select>
+</mapper>

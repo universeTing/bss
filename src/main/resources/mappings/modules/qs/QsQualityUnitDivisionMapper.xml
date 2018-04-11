@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.jjxx.modules.qs.mapper.QsQualityUnitDivisionMapper" >
+
+	<sql id="Base_Column_List" >
+		t.id,
+		t.name,
+		t.parent_id,
+		t.parent_ids,
+		t.parent_id AS parent_id,
+		p.name AS parent_name,
+		p.code AS parentCode,
+	    t.create_by AS "createBy.id",
+	    t.create_date,
+	    t.update_by AS "updateBy.id",
+	    t.update_date,
+	    t.del_flag,
+	    t.remarks,
+	    t.code,
+	    t.org_id,
+	    t.engineer_type,
+	    t.node_point_type,
+	    t.key_project,
+	    t.start_date,
+	    t.end_date,
+	    t.unit,
+	    t.number,
+	    t.audit_status,
+	    t.audit_by AS "auditBy.id",
+	    u.realname as "auditBy.realname",
+	    t.audit_date,
+	   (select count(*) from qs_quality_unit_division s
+		WHERE s.parent_id=t.id) as
+		hasChildren
+	</sql>
+	<sql id="parentJoins">
+		LEFT JOIN qs_quality_unit_division p ON p.id = t.parent_id
+	</sql>
+	
+	<sql id="leftJoin">
+  		LEFT JOIN sys_user u ON t.audit_by = u.id <!-- 关联用户信息 -->
+  		LEFT JOIN sys_organization org ON t.org_id=org.id <!-- 关联组织信息 -->
+    </sql>
+    <!-- 查找通过ID查找树信息 -->
+	<select id="selectByTreeId" resultType="QsQualityUnitDivision"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from qs_quality_unit_division t
+		<include refid="parentJoins" />
+		<include refid="leftJoin" />
+		where t.id = #{id,jdbcType=VARCHAR}
+	</select>
+	
+	<!-- 查找树列表 -->
+	<select id="selectTreeList" resultType="QsQualityUnitDivision">
+		select
+		<include refid="Base_Column_List" />
+		from qs_quality_unit_division t
+		<include refid="parentJoins" />
+		<include refid="leftJoin" />
+		<where>
+			${ew.sqlSegment}
+		</where>
+	</select>
+	
+	<select id="selectByOrgId" resultType="QsQualityUnitDivision">
+		select
+		<include refid="Base_Column_List" />
+		from qs_quality_unit_division t
+		<include refid="parentJoins" />
+		<include refid="leftJoin" />
+		  WHERE t.org_id= #{orgId}	
+	</select>
+
+	<!-- 更新子树 -->
+	<update id="updateSunTreeParentIds">
+		update qs_quality_unit_division set parent_ids=CONCAT(#{newParentIds},
+        <if test="'${dbType}' == 'mysql'">
+            substring(parent_ids, length(#{oldParentIds})+1,length(parent_ids)+1))
+        </if>
+        <if test="'${dbType}' == 'oracle'">
+            substr(parent_ids, length(#{oldParentIds})+1,length(parent_ids)+1))
+        </if>
+		where parent_ids like concat(#{oldParentIds}, '%')
+	</update>
+	
+	<!-- 删除子树 -->
+	<delete id="deleteSunTree" parameterType="java.lang.String">
+		delete from qs_quality_unit_division
+		where parent_ids like concat(#{oldParentIds}, '%')
+	</delete>
+	
+	<!-- 更新子树 -->
+	<update id="updateAuditStatus">
+		update qs_quality_unit_division set audit_status=#{status}
+        where id IN (#{ids})
+	</update>
+</mapper>
